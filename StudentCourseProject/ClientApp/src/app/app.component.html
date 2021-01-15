@@ -1,0 +1,77 @@
+<body>
+  <div class='card'>
+    <div class='card-header'>
+      Student Course Application
+    </div>
+
+    
+    <div class='card-body'>
+      <div class="row">
+        <button class="open-button" id="openform" (click)="openForm()">Add New Student</button>
+        <div class="form-popup" id="myForm">
+          <form class="form-container">
+            <h3>Add New Student</h3>
+        
+            <input type="text" placeholder="Enter Name" maxlength="20" 
+             required>
+        
+            <input type="text" placeholder="Enter Grade" maxlength="40" required>
+
+            <input type="text" placeholder="Enter CourseId" required>
+            <button type="submit" class="btn">Add</button>
+            <button type="submit" class="btn cancel" (click)="closeForm()">Close</button>
+          </form>
+        </div>
+      </div>
+
+      <div class="table-responsive">
+        <table class="table"
+               *ngIf="students && students.length">
+          <thead>
+            <tr>
+              <th>Name</th>
+              <th>Grade</th>
+              <th>Options</th>
+            </tr>
+          </thead>
+
+          <tbody>
+            <tr *ngFor="let student of students">
+              <td>
+                <a class="btn" (click)="openEditForm()">{{student.name}}</a>
+
+                <div class="form-popup" id="eForm">
+                  <form class="form-container">
+                    <h3>Edit Student</h3>
+                
+                    <input type="text" placeholder="Enter Name" maxlength="20" 
+                     required>
+                
+                    <input type="text" placeholder="Enter Grade" maxlength="40" required>
+        
+                    <input type="text" placeholder="Enter CourseId" required>
+                    <button type="submit" class="btn">Add</button>
+                    <button type="submit" class="btn cancel" (click)="closeEditForm()">Close</button>
+                  </form>
+                </div>
+              </td>
+              <td>{{student.grade}}</td>
+              <td>
+                <a class="btn" (click)="openDeleteForm()" >Delete</a>
+                <div class="form-popup" id="dForm">
+                  <form class="form-container">
+                    <h3>Delete Student</h3>
+                    <h5>Are you sure?</h5>
+                    <button type="submit" (click)="deleteStudent(student.studentId)" class="btn">Delete</button>
+                    <button type="submit" class="btn cancel" (click)="closeDeleteForm()">Close</button>
+                  </form>
+                </div>
+              </td>
+            </tr>
+          </tbody>
+        </table>
+      </div>
+    </div>
+
+  </div>
+</body>
