@@ -2,6 +2,7 @@ import { HttpClient } from '@angular/common/http';
 import { Injectable } from '@angular/core';
 import { Observable } from 'rxjs';
 import { Student } from './IStudent';
+import { Course } from './ICourse';
 
 @Injectable({
   providedIn: 'root'
@@ -12,19 +13,23 @@ export class DataService {
   private baseUrl = 'api/Students/';
   constructor(private http: HttpClient) { }
 
-  getNotes(courseId:number): Observable<Student[]> {
-    return this.http.get<Student[]>(this.baseUrl+courseId.toString());
+  getStudents(courseName:string): Observable<Student[]> {
+    return this.http.get<Student[]>(this.baseUrl+courseName);
   }
 
-  postNote(student: Student) {
+  postStudent(student: Student) {
     return this.http.post<Student>(this.baseUrl, student);
   }
 
-  putNote(student:Student) {
+  putStudent(student:Student) {
     return this.http.put(this.baseUrl + student.studentId.toString(), student);
   }
 
-  deleteNote(studentId: number) {
+  deleteStudent(studentId: number) {
     return this.http.delete(this.baseUrl + studentId.toString());
+  }
+
+  getAllCourses() {
+    return this.http.get<Course[]>('api/Courses/');
   }
 }

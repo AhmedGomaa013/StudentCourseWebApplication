@@ -22,7 +22,7 @@ namespace StudentCourseProject
         // This method gets called by the runtime. Use this method to add services to the container.
         public void ConfigureServices(IServiceCollection services)
         {
-            services.AddControllersWithViews();
+            services.AddControllersWithViews().AddNewtonsoftJson();
 
             services.AddDbContext<StudentCourseContext>(options => {
                 options.UseSqlServer(Configuration.GetConnectionString("ConnectionString"));

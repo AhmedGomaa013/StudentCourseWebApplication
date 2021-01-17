@@ -5,15 +5,25 @@ import { HttpClientModule } from '@angular/common/http';
 
 import { AppComponent } from './app.component';
 import { BrowserModule } from '@angular/platform-browser';
+import { MatDialogModule } from '@angular/material/dialog';
+import { NoopAnimationsModule } from '@angular/platform-browser/animations';
+import { DialogComponent } from './dialog/dialog.component';
+import { RouterModule } from '@angular/router';
 
 @NgModule({
   declarations: [
-    AppComponent
+    AppComponent,
+    DialogComponent
   ],
   imports: [
     HttpClientModule,
     FormsModule,
-    BrowserModule
+    BrowserModule,
+    RouterModule.forRoot([
+      {path:'openDialog', component:DialogComponent}
+]),
+    MatDialogModule,
+    NoopAnimationsModule
   ],
   providers: [],
   bootstrap: [AppComponent]

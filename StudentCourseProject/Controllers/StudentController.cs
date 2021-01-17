@@ -28,13 +28,13 @@ namespace StudentCourseProject.Controllers
             _logger = logger;
         }
 
-        [HttpGet("{courseId}")]
-        // Get => api/Students/courseId
-        public ActionResult GetAllStudents(int courseId)
+        [HttpGet("{courseName}")]
+        // Get => api/Students/courseName
+        public ActionResult GetAllStudents(string courseName)
         {
             try
             {
-                var students = _studentRepository.GetAllStudentsByCourseId(courseId);
+                var students = _studentRepository.GetAllStudentsByCourseName(courseName);
 
                 return Ok(students);
             }
@@ -45,7 +45,7 @@ namespace StudentCourseProject.Controllers
             }
         }
 
-        [HttpPost()]
+        [HttpPost]
         // Post => api/Student/
         public ActionResult PostStudent(StudentViewModel model)
         {
@@ -53,18 +53,21 @@ namespace StudentCourseProject.Controllers
             {
                 if (ModelState.IsValid)
                 {
+                    var course = _courseRepository.GetCourseById(model.CourseId);
+                    if (course == null) return NotFound("Course not found!");
+
                     var student = new Student()
                     {
                         Name = model.Name,
                         Grade = model.Grade,
-                        CourseIdentification = _courseRepository.GetCourseById(model.CourseId)
+                        CourseIdentification = course
                     };
 
-                    _studentRepository.AddStudent(student);
-
-                    if (_studentRepository.SaveAll())
+                    var studentId = _studentRepository.AddStudent(student);
+                    
+                    if (studentId != -1)
                     {
-                        return Created("api/student", new { message = "Student Added" });
+                        return Created("api/student", studentId);
                     }
                     else
                     {
@@ -93,12 +96,15 @@ namespace StudentCourseProject.Controllers
             {
                 if (ModelState.IsValid)
                 {
+                    var course = _courseRepository.GetCourseById(model.CourseId);
+                    if (course == null) return NotFound("Course not found!");
+                    
                     var student = _studentRepository.GetStudentById(studentId);
-
                     if (student == null) return NotFound();
+
                     student.Grade = model.Grade;
                     student.Name = model.Name;
-                    student.CourseIdentification = _courseRepository.GetCourseById(model.CourseId);
+                    student.CourseIdentification = course;
 
                     if (_studentRepository.SaveAll())
                     {

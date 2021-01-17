@@ -1,60 +1,132 @@
-import { Component } from '@angular/core';
+import { Component, OnInit } from '@angular/core';
+import { MatDialog } from '@angular/material/dialog';
 import { DataService } from './data.service';
+import { DialogComponent } from './dialog/dialog.component';
 import { Student } from './IStudent';
+import { Course } from './ICourse';
 
 
 @Component({
   selector: 'app-root',
   templateUrl: './app.component.html'
 })
-export class AppComponent {
+export class AppComponent implements OnInit{
   
-  constructor(private dataService:DataService){}
+  constructor(private dataService:DataService,
+              private dialog:MatDialog){}
 
+  courses: Course[] = [];
+  selectedCourse: string;
   students: Student[] = [];
-
-newStudent:Student = {
-  studentId:0,
-  courseId:0,
-  grade:"",
-  name:""
-};
+  
 
 openForm() {
-  document.getElementById("myForm").style.display = "block";
-  document.getElementById("openform").style.display = "none";
+  const openedDialog = this.dialog.open(DialogComponent,{
+    data: {
+      title: "Add",
+      name: '',
+      grade: '',
+      courseId: 0,
+      studentId: 0
+    }
+  });
+  openedDialog.afterClosed().subscribe(
+    result => {
+      if(result)
+          this.addStudent(result);
+    }
+  )
+}
+
+openEditForm(student:Student) {
+  const openedDialog = this.dialog.open(DialogComponent,{
+    data: {
+      title:"Edit",
+      name:student.name,
+      grade:student.grade,
+      courseId: student.courseId,
+      studentId: student.studentId
+    }
+    });
   
+  openedDialog.afterClosed().subscribe(
+    result => {
+      if (result)
+          this.editStudent(result,student);
+    }
+  );
 }
 
-closeForm() {
-  document.getElementById("myForm").style.display = "none";
-  document.getElementById("openform").style.display = "block";
-}
 
-openDeleteForm() {
-  document.getElementById("dForm").style.display = "block"; 
-}
+deleteStudent(student:Student){
 
-closeDeleteForm() {
-  document.getElementById("dForm").style.display = "none";
-}
-
-openEditForm() {
-  document.getElementById("eForm").style.display = "block";
-  
-}
-
-closeEditForm() {
-  document.getElementById("eForm").style.display = "none";
-}
-
-deleteStudent(studentId:number){
-  
-this.dataService.deleteNote(studentId).subscribe(
+  if(confirm("Are you sure to delete this row?"))
+  {
+this.dataService.deleteStudent(student.studentId).subscribe(
   res => {
-
+    let index:number = this.students.indexOf(student,0);
+    this.students.splice(index,1);
+  });
   }
-);
+}
 
+editStudent(newStudent:Student,prevStudent:Student)
+{
+  this.dataService.putStudent(newStudent).subscribe(
+    res => {
+      if (prevStudent.courseId === newStudent.courseId) {
+        prevStudent.name = newStudent.name;
+        prevStudent.grade = newStudent.grade;
+        prevStudent.courseId = newStudent.courseId;
+      }
+      else {
+        let index = this.students.indexOf(prevStudent, 0);
+        this.students.splice(index, 1);
+      }
+    }
+  );
+}
+
+addStudent(student:Student)
+{
+
+  this.dataService.postStudent(student).subscribe({
+    next: (res: any) => {
+      student.studentId = res;
+      let course = this.courses.find(o => {
+        return o.courseName === this.selectedCourse;
+      });
+      console.log(course);
+      if (student.courseId === course.courseId)
+        this.students.push(student);
+    }
+  }
+  );
+
+}
+
+  changeCourse() {
+    this.dataService.getStudents(this.selectedCourse).subscribe(
+      {
+        next: res => this.students = res
+      }
+    );
+  }
+
+
+  ngOnInit(): void {
+    this.dataService.getAllCourses().subscribe(
+      {
+        next: res => {
+          this.courses = res;
+        },
+        complete: () => {
+          this.selectedCourse = this.courses[0].courseName;
+          this.dataService.getStudents(this.selectedCourse).subscribe({
+            next: res => this.students = res
+          });
+        }
+      }
+    );
 }
 }

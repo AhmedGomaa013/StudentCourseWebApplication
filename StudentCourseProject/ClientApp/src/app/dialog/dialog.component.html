@@ -1,0 +1,17 @@
+<h2 mat-dialog-title style="font-weight: bold; text-align: center;">{{data.title=='Edit'?'Edit Student':'Add new Student'}}</h2>
+
+    <div mat-dialog-content style="min-width: 100;">
+      <input type="text" placeholder="Enter Name" maxlength="20" 
+        [(ngModel)]="studentName" name="name"  required>
+
+      <input type="text" placeholder="Enter Grade" maxlength="40" 
+      [(ngModel)]="studentGrade" name="grade"  required>
+
+      <input type="text" placeholder="Enter CourseId" 
+      [(ngModel)]="studentCourseId" name="courseId"   required>
+    </div>
+
+    <div mat-dialog-actions>
+        <button type="submit" class="btn" (click)="editOrAddStudent()">{{data.title}}</button>
+        <button type="submit" class="btn cancel" (click)="closeDialog()">Close</button>
+      </div>

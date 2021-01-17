@@ -19,15 +19,22 @@ namespace StudentCourseProject.Models
             _studentCourseContext = studentCourseContext;
             _logger = logger;
         }
-        public void AddStudent(Student student)
+        public int AddStudent(Student student)
         {
             try
             {
-                _studentCourseContext.Add(student);
+                var createdEntity = _studentCourseContext.Add(student);
+                if (SaveAll())
+                { 
+                    return createdEntity.Entity.StudentId; 
+                }
+
+                return -1;
             }
             catch(Exception e)
             {
                 _logger.LogError($"DateTime:{DateTime.Now} -- Error:{e.Message}\n{e.StackTrace}");
+                return -1;
             }
         }
 
@@ -49,6 +56,7 @@ namespace StudentCourseProject.Models
             {
                 return _studentCourseContext.Students
                     .Where(o => o.StudentId == studentId)
+                    .Include(o=>o.CourseIdentification)
                     .FirstOrDefault();
             }
             catch (Exception e)
@@ -57,12 +65,13 @@ namespace StudentCourseProject.Models
                 return null;
             }
         }
-        public List<Student> GetAllStudentsByCourseId(int course)
+        public List<Student> GetAllStudentsByCourseName(string course)
         {
             try
             {
                 return _studentCourseContext.Students
-                    .Where(o => o.CourseIdentification.CourseId == course)
+                    .Where(o => o.CourseIdentification.CourseName == course)
+                    .Include(o => o.CourseIdentification)
                     .ToList();
             }
             catch (Exception e)
